@@ -18,7 +18,8 @@ public class FileWriterServiceImpl implements WriterService {
 
     @Override
     public void writeList(List<User> userList) {
-        userList.forEach(this::writeUser);
+//        userList.forEach(this::writeUser);
+        userList.forEach(System.out::println);
     }
 
     private void writeUser(User user) {

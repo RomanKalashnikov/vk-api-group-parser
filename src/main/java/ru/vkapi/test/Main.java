@@ -15,10 +15,11 @@ public class Main {
     private UserListFilter listFilter;
     private WriterService writerService;
 
-//            private static final String GROUP = "javarush";
-
-    private static final String GROUP = "rostelecom.career";
-    private static final String CITY_NAME = "Новосибирск";
+            private static final String GROUP = "javarush";
+    //629902
+//    666517
+//    private static final String GROUP = "rostelecom.career";
+    private static final String CITY_NAME = "Novosibirsk";
 
     private Main(UserParamGetter paramGetter, UserListFilter listFilter, WriterService writerService) {
         this.paramGetter = paramGetter;
@@ -41,13 +42,13 @@ public class Main {
     }
 
     private void run() {
+        final long start = System.currentTimeMillis();
         List<User> userList = paramGetter.getUserList(GROUP);
-        final long start = System.nanoTime();
+        final long stop = System.currentTimeMillis();
         final List<User> filteredUsersByCity = listFilter.byCity(userList, CITY_NAME);
 
-        final long stop = System.nanoTime();
-        System.out.println(stop - start);
         writerService.writeList(filteredUsersByCity);
+        System.out.println(stop - start);
     }
 
 }
