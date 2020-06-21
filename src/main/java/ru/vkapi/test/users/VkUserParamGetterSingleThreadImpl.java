@@ -15,8 +15,8 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VkUserParamGetterImpl implements UserParamGetter {
-    private static final Logger logger = LoggerFactory.getLogger(VkUserParamGetterImpl.class);
+public class VkUserParamGetterSingleThreadImpl implements UserParamGetter {
+    private static final Logger logger = LoggerFactory.getLogger(VkUserParamGetterSingleThreadImpl.class);
     private static final Integer USER_ID = 16337119;
     private static final String ACCESS_TOKEN = "649ca9e0649ca9e0649ca9e09064eee58e6649c649ca9e03a4e8a1e7164d7957913cba6";
     private static final int MAX_COUNT_MEMBERS_FOR_REQUEST = 1000;
@@ -27,7 +27,7 @@ public class VkUserParamGetterImpl implements UserParamGetter {
 
     private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
-    public VkUserParamGetterImpl() {
+    public VkUserParamGetterSingleThreadImpl() {
         vkApiClient = new VkApiClient(HttpTransportClient.getInstance());
         logger.info("Создано подключение к VkApiClient");
         userActor = new UserActor(USER_ID, ACCESS_TOKEN);

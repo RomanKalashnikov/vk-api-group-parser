@@ -4,7 +4,7 @@ import ru.vkapi.test.filter.StreamUserListFilter;
 import ru.vkapi.test.filter.UserListFilter;
 import ru.vkapi.test.users.User;
 import ru.vkapi.test.users.UserParamGetter;
-import ru.vkapi.test.users.VkUserParamGetterImpl;
+import ru.vkapi.test.users.VkUserParamGetterSingleThreadImpl;
 import ru.vkapi.test.writer.FileWriterServiceImpl;
 import ru.vkapi.test.writer.WriterService;
 
@@ -31,7 +31,7 @@ public class Main {
             throw new RuntimeException("Длинна аргумента неверная");
         }
         final String pathToFile = args[0];
-        UserParamGetter paramGetter = new VkUserParamGetterImpl();
+        UserParamGetter paramGetter = new VkUserParamGetterSingleThreadImpl();
 //        UserParamGetter paramGetter = new ThreadVkGetMembers();
         UserListFilter listFilter = new StreamUserListFilter();
         WriterService writerService = new FileWriterServiceImpl(pathToFile);
