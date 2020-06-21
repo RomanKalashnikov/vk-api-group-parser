@@ -4,30 +4,33 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.vkapi.test.users.User;
 
-import java.io.IOException;
-import java.nio.file.*;
+import java.io.*;
 import java.util.List;
 
 public class FileWriterServiceImpl implements WriterService {
     private static final Logger logger = LoggerFactory.getLogger(FileWriterServiceImpl.class);
-    private final Path path;
+    private File file;
 
     public FileWriterServiceImpl(String absolutePathToFile) {
-        this.path = Paths.get(absolutePathToFile);
+        this.file = new File(absolutePathToFile);
     }
 
     @Override
     public void writeList(List<User> userList) {
-//        userList.forEach(this::writeUser);
-        userList.forEach(System.out::println);
-    }
-
-    private void writeUser(User user) {
+        BufferedWriter writer;
         try {
-            Files.writeString(path, String.format("ID = %d, Name = %s, LastName = %s%n", user.getUserID(), user.getFirstName(), user.getLastName()));
+            writer = new BufferedWriter(new FileWriter(file));
+            for (User user : userList) {
+                writeUser(user,writer);
+            }
+            writer.flush();
+            writer.close();
         } catch (IOException e) {
-            logger.error("Не удалось записать пользователя: {}", user, e);
+            logger.error("Ошибка записи ", e);
         }
     }
 
+    private void writeUser(User user, Writer writer) throws IOException {
+        writer.write(String.format("ID = %d, Name = %s, LastName = %s%n", user.getUserID(), user.getFirstName(), user.getLastName()));
+    }
 }
