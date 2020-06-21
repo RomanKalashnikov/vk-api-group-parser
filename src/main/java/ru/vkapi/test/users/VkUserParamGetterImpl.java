@@ -16,17 +16,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class VkUserParamGetterImpl implements UserParamGetter {
     private static final Logger logger = LoggerFactory.getLogger(VkUserParamGetterImpl.class);
     private static final Integer USER_ID = 16337119;
     private static final String ACCESS_TOKEN = "649ca9e0649ca9e0649ca9e09064eee58e6649c649ca9e03a4e8a1e7164d7957913cba6";
     private static final int MAX_COUNT_MEMBERS_FOR_REQUEST = 1000;
-    private static final int MAX_COUNT_ERRORS = 5;
 
     private ExecutorService executor = Executors.newFixedThreadPool(15);
 
@@ -71,22 +71,22 @@ public class VkUserParamGetterImpl implements UserParamGetter {
     }
 
     private List<GetMembersFieldsResponse> getGetMembersFieldsResponses(ArrayList<Future<GetMembersFieldsResponse>> futures) {
-        List<GetMembersFieldsResponse> fieldsResponseSet = new ArrayList<>();
+        List<GetMembersFieldsResponse> fieldsResponseList = new ArrayList<>();
         futures.forEach(future -> {
             try {
-                fieldsResponseSet.add(future.get());
+                fieldsResponseList.add(future.get());
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         });
-        return fieldsResponseSet;
+        return fieldsResponseList;
     }
 
     private void waitAllTask(ArrayList<Future<GetMembersFieldsResponse>> futures) {
         while (futures.stream().anyMatch(f -> !f.isDone())){
             logger.info("Ожидаем выполнения всех задач futures");
             try {
-                Thread.sleep(1000);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

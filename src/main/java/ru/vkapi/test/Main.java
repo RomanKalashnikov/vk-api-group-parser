@@ -15,10 +15,9 @@ public class Main {
     private UserListFilter listFilter;
     private WriterService writerService;
 
-            private static final String GROUP = "javarush";
-    //629902
-//    666517
-//    private static final String GROUP = "rostelecom.career";
+//            private static final String GROUP = "javarush";
+
+    private static final String GROUP = "rostelecom.career";
     private static final String CITY_NAME = "Novosibirsk";
 
     private Main(UserParamGetter paramGetter, UserListFilter listFilter, WriterService writerService) {
@@ -33,7 +32,6 @@ public class Main {
         }
         final String pathToFile = args[0];
         UserParamGetter paramGetter = new VkUserParamGetterImpl();
-//        UserParamGetter paramGetter = new ThreadVkGetMembers();
         UserListFilter listFilter = new StreamUserListFilter();
         WriterService writerService = new FileWriterServiceImpl(pathToFile);
 

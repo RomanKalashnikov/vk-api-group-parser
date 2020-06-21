@@ -29,4 +29,5 @@ public class FileWriterServiceImpl implements WriterService {
             logger.error("Не удалось записать пользователя: {}", user, e);
         }
     }
+
 }
