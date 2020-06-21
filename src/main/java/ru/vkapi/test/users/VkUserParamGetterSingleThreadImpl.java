@@ -22,10 +22,10 @@ public class VkUserParamGetterSingleThreadImpl implements UserParamGetter {
     private static final int MAX_COUNT_MEMBERS_FOR_REQUEST = 1000;
     private static final int MAX_COUNT_ERRORS = 5;
 
-    private VkApiClient vkApiClient;
-    private UserActor userActor;
+    private final VkApiClient vkApiClient;
+    private final UserActor userActor;
 
-    private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
+    private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
     public VkUserParamGetterSingleThreadImpl() {
         vkApiClient = new VkApiClient(HttpTransportClient.getInstance());
@@ -36,7 +36,6 @@ public class VkUserParamGetterSingleThreadImpl implements UserParamGetter {
 
     @Override
     public List<User> getUserList(String group) {
-        logger.info("Попытка получение ответа от VK");
         return userMapper.toDomainList(getUserXtrRoles(group));
     }
 
@@ -64,7 +63,6 @@ public class VkUserParamGetterSingleThreadImpl implements UserParamGetter {
     }
 
     private GetMembersFieldsResponse getUserList(String group, Integer offset) {
-        logger.info("Попытка получение ответа от VK");
         GetMembersFieldsResponse getMembers = null;
         try {
             getMembers = vkApiClient
@@ -75,7 +73,7 @@ public class VkUserParamGetterSingleThreadImpl implements UserParamGetter {
                     .count(MAX_COUNT_MEMBERS_FOR_REQUEST)
                     .execute();
         } catch (ApiException | ClientException e) {
-            logger.info("Ошибка на стороне клиента или Api - ".concat(e.getMessage()));
+            logger.info("Ошибка на стороне клиента или Api", e);
         }
         return getMembers;
     }

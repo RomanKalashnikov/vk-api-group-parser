@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ForeachUserListFilter implements UserListFilter {
+
     @Override
     public List<User> byCity(List<User> userList, String cityName) {
         List<User> list = new ArrayList<>();

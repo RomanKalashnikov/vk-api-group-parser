@@ -5,7 +5,7 @@ import com.vk.api.sdk.queries.groups.GroupsGetMembersQueryWithFields;
 
 import java.util.concurrent.Callable;
 
-public class TaskMemberQuery implements Callable<GetMembersFieldsResponse> {
+class TaskMemberQuery implements Callable<GetMembersFieldsResponse> {
     private final GroupsGetMembersQueryWithFields membersQueryWithFields;
 
     public TaskMemberQuery(GroupsGetMembersQueryWithFields membersQueryWithFields) {

@@ -28,11 +28,11 @@ public class VkUserParamGetterMultithreadedImpl implements UserParamGetter {
     private static final String ACCESS_TOKEN = "649ca9e0649ca9e0649ca9e09064eee58e6649c649ca9e03a4e8a1e7164d7957913cba6";
     private static final int MAX_COUNT_MEMBERS_FOR_REQUEST = 1000;
 
-    private ExecutorService executor ;
-    private VkApiClient vkApiClient;
-    private UserActor userActor;
+    private final ExecutorService executor;
+    private final VkApiClient vkApiClient;
+    private final UserActor userActor;
 
-    private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
+    private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
     public VkUserParamGetterMultithreadedImpl(int numberFixedThreadPool) {
         vkApiClient = new VkApiClient(HttpTransportClient.getInstance());
@@ -40,6 +40,7 @@ public class VkUserParamGetterMultithreadedImpl implements UserParamGetter {
         userActor = new UserActor(USER_ID, ACCESS_TOKEN);
         logger.info("Получен UserActor");
         executor = Executors.newFixedThreadPool(numberFixedThreadPool);
+        logger.info("Создан пулл на {} потоков", numberFixedThreadPool);
     }
 
     @Override
@@ -75,19 +76,19 @@ public class VkUserParamGetterMultithreadedImpl implements UserParamGetter {
             try {
                 fieldsResponseList.add(future.get());
             } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
+                logger.error("Ошибка добавления  в общий лист результатов", e);
             }
         });
         return fieldsResponseList;
     }
 
     private void waitAllTask(ArrayList<Future<GetMembersFieldsResponse>> futures) {
-        while (futures.stream().anyMatch(f -> !f.isDone())){
+        while (futures.stream().anyMatch(f -> !f.isDone())) {
             logger.info("Ожидаем выполнения всех задач futures");
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error("Поток прерван {} ", Thread.currentThread(), e);
             }
         }
     }
@@ -95,7 +96,7 @@ public class VkUserParamGetterMultithreadedImpl implements UserParamGetter {
     private ArrayList<Future<GetMembersFieldsResponse>> prepareFutureRequest(String group, int number) {
         final ArrayList<Future<GetMembersFieldsResponse>> futures = new ArrayList<>();
 
-        int numberOffsetTask = number/MAX_COUNT_MEMBERS_FOR_REQUEST;
+        int numberOffsetTask = number / MAX_COUNT_MEMBERS_FOR_REQUEST;
         for (int i = 0; i <= numberOffsetTask; i++) {
             TaskMemberQuery task = new TaskMemberQuery(getMembersQueryWithFields(group, i * MAX_COUNT_MEMBERS_FOR_REQUEST));
             futures.add(executor.submit(task));
@@ -113,9 +114,9 @@ public class VkUserParamGetterMultithreadedImpl implements UserParamGetter {
         try {
             final List<GroupFull> execute = query.execute();
 
-             number = execute.get(0).getMembersCount();
+            number = execute.get(0).getMembersCount();
         } catch (ApiException | ClientException e) {
-            e.printStackTrace();
+           logger.error("Ошибка получения списка пользователей" , e);
         }
         return number;
     }

@@ -3,12 +3,23 @@ plugins {
 }
 
 group 'ru.kalashnikov.test.vkparse'
-version '1.0-SNAPSHOT'
 
-sourceCompatibility = 11
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
 
 repositories {
     mavenCentral()
+}
+//create a single Jar with all dependencies
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Jar File Example',
+                'Main-Class': 'ru.vkapi.test.Main'
+    }
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
 }
 
 //compileJava.options.encoding = 'UTF-8'

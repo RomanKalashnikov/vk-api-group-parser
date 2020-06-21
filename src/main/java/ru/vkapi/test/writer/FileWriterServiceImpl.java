@@ -9,7 +9,7 @@ import java.util.List;
 
 public class FileWriterServiceImpl implements WriterService {
     private static final Logger logger = LoggerFactory.getLogger(FileWriterServiceImpl.class);
-    private File file;
+    private final File file;
 
     public FileWriterServiceImpl(String absolutePathToFile) {
         this.file = new File(absolutePathToFile.endsWith(".txt") ? absolutePathToFile : absolutePathToFile + ".txt");
