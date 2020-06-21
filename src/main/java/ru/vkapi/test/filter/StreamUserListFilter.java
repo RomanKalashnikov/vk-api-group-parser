@@ -10,7 +10,9 @@ public class StreamUserListFilter implements UserListFilter {
     @Override
     public List<User> byCity(List<User> userList, String cityName) {
         return userList.stream()
-                .filter(user -> cityName.equalsIgnoreCase(user.getCityName()) && user.getFirstName() != null && user.getLastName() != null)
+                .filter(user -> cityName.equalsIgnoreCase(user.getCityName())
+                        && user.getFirstName() != null
+                        && user.getLastName() != null)
                 .collect(Collectors.toList());
     }
 }

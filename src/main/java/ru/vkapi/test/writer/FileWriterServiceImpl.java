@@ -5,15 +5,14 @@ import org.slf4j.LoggerFactory;
 import ru.vkapi.test.users.User;
 
 import java.io.*;
-import java.nio.file.*;
 import java.util.List;
 
 public class FileWriterServiceImpl implements WriterService {
     private static final Logger logger = LoggerFactory.getLogger(FileWriterServiceImpl.class);
-    private  File file;
+    private File file;
 
     public FileWriterServiceImpl(String absolutePathToFile) {
-        this.file = new File(absolutePathToFile);
+        this.file = new File(absolutePathToFile.endsWith(".txt") ? absolutePathToFile : absolutePathToFile + ".txt");
     }
 
     @Override
@@ -32,6 +31,6 @@ public class FileWriterServiceImpl implements WriterService {
     }
 
     private void writeUser(User user, Writer writer) throws IOException {
-            writer.write(String.format("ID = %d, Name = %s, LastName = %s%n", user.getUserID(), user.getFirstName(), user.getLastName()));
+        writer.write(String.format("ID = %d, Name = %s, LastName = %s%n", user.getUserID(), user.getFirstName(), user.getLastName()));
     }
 }

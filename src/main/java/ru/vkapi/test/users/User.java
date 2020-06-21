@@ -42,11 +42,9 @@ public class User {
 
     @Override
     public String toString() {
-        return "User" +
-                "userID=" + userID +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", cityName='" + cityName + '\'' +
-                '}';
+        return "userID = " + userID +
+                ", firstName = " + firstName  +
+                ", lastName = " + lastName  +
+                ", cityName = " + cityName  ;
     }
 }
