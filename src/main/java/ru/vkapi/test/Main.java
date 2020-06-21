@@ -4,7 +4,7 @@ import ru.vkapi.test.filter.StreamUserListFilter;
 import ru.vkapi.test.filter.UserListFilter;
 import ru.vkapi.test.users.User;
 import ru.vkapi.test.users.UserParamGetter;
-import ru.vkapi.test.users.VkUserParamGetterImpl;
+import ru.vkapi.test.users.VkUserParamGetterMultithreadedImpl;
 import ru.vkapi.test.writer.FileWriterServiceImpl;
 import ru.vkapi.test.writer.WriterService;
 
@@ -15,10 +15,10 @@ public class Main {
     private UserListFilter listFilter;
     private WriterService writerService;
 
-//            private static final String GROUP = "javarush";
-
+    //    private static final String GROUP = "javarush";
     private static final String GROUP = "rostelecom.career";
     private static final String CITY_NAME = "Novosibirsk";
+    private static final int DEFAULT_NUMBER_THREAD_POOL = 100;
 
     private Main(UserParamGetter paramGetter, UserListFilter listFilter, WriterService writerService) {
         this.paramGetter = paramGetter;
@@ -27,11 +27,22 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        if (args.length != 1) {
-            throw new RuntimeException("Длинна аргумента неверная");
+        if (args.length < 1) {
+            throw new RuntimeException("Количество аргументов неверное");
         }
-        final String pathToFile = args[0];
-        UserParamGetter paramGetter = new VkUserParamGetterImpl();
+        UserParamGetter paramGetter = null;
+        if ("-m".equals(args[0])) {
+            int numberThreadPool;
+            try {
+                numberThreadPool = Integer.parseInt(args[1]);
+            } catch (NumberFormatException e) {
+                numberThreadPool = DEFAULT_NUMBER_THREAD_POOL;
+            }
+            System.out.println(numberThreadPool);
+            paramGetter = new VkUserParamGetterMultithreadedImpl(numberThreadPool);
+        }
+        final String pathToFile = args.length == 3 ? args[2] : args[1];
+
         UserListFilter listFilter = new StreamUserListFilter();
         WriterService writerService = new FileWriterServiceImpl(pathToFile);
 

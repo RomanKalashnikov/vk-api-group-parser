@@ -12,7 +12,7 @@ public class FileWriterServiceImpl implements WriterService {
     private File file;
 
     public FileWriterServiceImpl(String absolutePathToFile) {
-        this.file = new File(absolutePathToFile);
+        this.file = new File(absolutePathToFile.endsWith(".txt") ? absolutePathToFile : absolutePathToFile + ".txt");
     }
 
     @Override

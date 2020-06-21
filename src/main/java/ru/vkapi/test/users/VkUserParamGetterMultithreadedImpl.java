@@ -22,25 +22,24 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class VkUserParamGetterImpl implements UserParamGetter {
-    private static final Logger logger = LoggerFactory.getLogger(VkUserParamGetterImpl.class);
+public class VkUserParamGetterMultithreadedImpl implements UserParamGetter {
+    private static final Logger logger = LoggerFactory.getLogger(VkUserParamGetterMultithreadedImpl.class);
     private static final Integer USER_ID = 16337119;
     private static final String ACCESS_TOKEN = "649ca9e0649ca9e0649ca9e09064eee58e6649c649ca9e03a4e8a1e7164d7957913cba6";
     private static final int MAX_COUNT_MEMBERS_FOR_REQUEST = 1000;
 
-    private ExecutorService executor = Executors.newFixedThreadPool(15);
-
-
+    private ExecutorService executor ;
     private VkApiClient vkApiClient;
     private UserActor userActor;
 
     private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
-    public VkUserParamGetterImpl() {
+    public VkUserParamGetterMultithreadedImpl(int numberFixedThreadPool) {
         vkApiClient = new VkApiClient(HttpTransportClient.getInstance());
         logger.info("Создано подключение к VkApiClient");
         userActor = new UserActor(USER_ID, ACCESS_TOKEN);
         logger.info("Получен UserActor");
+        executor = Executors.newFixedThreadPool(numberFixedThreadPool);
     }
 
     @Override
@@ -50,23 +49,23 @@ public class VkUserParamGetterImpl implements UserParamGetter {
     }
 
     private List<UserXtrRole> getUserXtrRoles(String group) {
-        //оформляем запрос и получам количество участников группы
+//       оформляем запрос и получам количество участников группы
         int number = getMemberCountInGroup(group);
-
-        final ArrayList<Future<GetMembersFieldsResponse>> futures = prepareFutureRequ(group, number);
-
+//        распределяем количество задач отталкиваясь от количества участников
+        final ArrayList<Future<GetMembersFieldsResponse>> futures = prepareFutureRequest(group, number);
+//        ожидаем выполнения всех задач
         waitAllTask(futures);
-
+//        складываем результат всех задач в лист
         List<GetMembersFieldsResponse> fieldsResponseSet = getGetMembersFieldsResponses(futures);
-
+//        завершаем работу Executor-а
         executor.shutdown();
 
         return getUserXtrRoles(fieldsResponseSet);
     }
 
-    private ArrayList<UserXtrRole> getUserXtrRoles(List<GetMembersFieldsResponse> fieldsResponseSet) {
-        ArrayList<UserXtrRole> usersItem = new ArrayList<>();
-        fieldsResponseSet.stream().map(GetMembersFieldsResponse::getItems).forEach(usersItem::addAll);
+    private List<UserXtrRole> getUserXtrRoles(List<GetMembersFieldsResponse> fieldsResponseList) {
+        List<UserXtrRole> usersItem = new ArrayList<>();
+        fieldsResponseList.stream().map(GetMembersFieldsResponse::getItems).forEach(usersItem::addAll);
         return usersItem;
     }
 
@@ -86,19 +85,19 @@ public class VkUserParamGetterImpl implements UserParamGetter {
         while (futures.stream().anyMatch(f -> !f.isDone())){
             logger.info("Ожидаем выполнения всех задач futures");
             try {
-                Thread.sleep(500);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private ArrayList<Future<GetMembersFieldsResponse>> prepareFutureRequ(String group, int number) {
+    private ArrayList<Future<GetMembersFieldsResponse>> prepareFutureRequest(String group, int number) {
         final ArrayList<Future<GetMembersFieldsResponse>> futures = new ArrayList<>();
 
         int numberOffsetTask = number/MAX_COUNT_MEMBERS_FOR_REQUEST;
         for (int i = 0; i <= numberOffsetTask; i++) {
-            TaskMemberQuery task = new TaskMemberQuery(getQ(group, i * MAX_COUNT_MEMBERS_FOR_REQUEST));
+            TaskMemberQuery task = new TaskMemberQuery(getMembersQueryWithFields(group, i * MAX_COUNT_MEMBERS_FOR_REQUEST));
             futures.add(executor.submit(task));
         }
         return futures;
@@ -121,7 +120,7 @@ public class VkUserParamGetterImpl implements UserParamGetter {
         return number;
     }
 
-    private GroupsGetMembersQueryWithFields getQ(String group, Integer offset) {
+    private GroupsGetMembersQueryWithFields getMembersQueryWithFields(String group, Integer offset) {
         return vkApiClient
                 .groups()
                 .getMembersWithFields(userActor, Fields.CITY)
